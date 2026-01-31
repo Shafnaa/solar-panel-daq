@@ -2,7 +2,6 @@ import asyncio
 import json
 import time
 import aiohttp
-import requests
 import websockets
 
 
@@ -251,7 +250,7 @@ async def modbus_reader():
             global latest_data
             latest_data = {"ts": timestamp, "data": data}
 
-            update_bucket(data)
+            await update_bucket(latest_data)
 
             # Broadcast latest data to WebSocket clients
             if latest_data:
