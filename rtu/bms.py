@@ -24,7 +24,7 @@ async def read_bms(device_id):
         return data
 
     try:
-        result = await client.read_holding_registers(
+        result =k await client.read_holding_registers(
             0x1000, count=16, device_id=device_id
         )
 

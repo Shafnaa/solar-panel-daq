@@ -28,21 +28,26 @@ async def read_ddsu(device_id):
             0x2000, count=16, device_id=device_id
         )
 
-        v = result.registers[0:2]
-        a = result.registers[2:4]
-        p = result.registers[4:6]
-        pr = result.registers[6:8]
-        pf = result.registers[10:12]
-        freq = result.registers[14:16]
+        if result.isError():
+            print(f"Error reading DDSU {device_id}: {result}")
 
-        data = {
-            "voltage": decode_float(v),
-            "current": decode_float(a),
-            "power": decode_float(p) * 1000,
-            "reactive_power": decode_float(pr) * 1000,
-            "power_factor": decode_float(pf),
-            "frequency": decode_float(freq),
-        }
+        else:
+            v = result.registers[0:2]
+            a = result.registers[2:4]
+            p = result.registers[4:6]
+            pr = result.registers[6:8]
+            pf = result.registers[10:12]
+            freq = result.registers[14:16]
+
+            data = {
+                "voltage": decode_float(v),
+                "current": decode_float(a),
+                "power": decode_float(p) * 1000,
+                "reactive_power": decode_float(pr) * 1000,
+                "power_factor": decode_float(pf),
+                "frequency": decode_float(freq),
+            }
+
     except Exception as e:
         print(f"Error reading DDSU {device_id}: {e}")
     finally:
