@@ -1,7 +1,5 @@
 from pymodbus.client import AsyncModbusSerialClient
 
-from helper.decode import decode_float
-
 from config import RTU_BAUD, RTU_PARITY, RTU_PORT, RTU_PZEM_STOPBITS
 
 
@@ -28,20 +26,26 @@ async def read_pzem(device_id):
             0x0000, count=8, device_id=device_id
         )
 
-        v = result.registers[0]
-        a = result.registers[1]
-        p = result.registers[2]
-        e = result.registers[4]
+        if result.isError():
+            print(f"Error reading PZEM {device_id}: {result}")
 
-        data = {
-            "voltage": v / 100.0,
-            "current": a / 100.0,
-            "power": p / 10.0,
-            "energy": e,
-        }
+        else:
+            v = result.registers[0]
+            a = result.registers[1]
+            p = result.registers[2]
+            e = result.registers[4]
+
+            data = {
+                "voltage": v / 100.0,
+                "current": a / 100.0,
+                "power": p / 10.0,
+                "energy": e,
+            }
+
     except Exception as e:
         print(f"Error reading PZEM {device_id}: {e}")
+
     finally:
-        await client.close()
+        client.close()
 
     return data

@@ -50,7 +50,8 @@ async def read_ddsu(device_id):
 
     except Exception as e:
         print(f"Error reading DDSU {device_id}: {e}")
+
     finally:
-        await client.close()
+        client.close()
 
     return data

@@ -26,16 +26,22 @@ async def read_sht(device_id):
             0x0001, count=2, device_id=device_id
         )
 
-        t = result.registers[0]
-        h = result.registers[1]
+        if result.isError():
+            print(f"Error reading SHT {device_id}: {result}")
 
-        data = {
-            "temperature": t / 10.0,
-            "humidity": h / 10.0,
-        }
+        else:
+            t = result.registers[0]
+            h = result.registers[1]
+
+            data = {
+                "temperature": t / 10.0,
+                "humidity": h / 10.0,
+            }
+
     except Exception as e:
         print(f"Error reading SHT {device_id}: {e}")
+
     finally:
-        await client.close()
+        client.close()
 
     return data
