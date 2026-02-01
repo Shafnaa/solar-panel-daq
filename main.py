@@ -5,6 +5,7 @@ import aiohttp
 import websockets
 
 
+from rtu.bms import read_bms
 from rtu.ddsu import read_ddsu
 from rtu.pzem import read_pzem
 from rtu.sht import read_sht
@@ -13,6 +14,7 @@ from rtu.sht import read_sht
 from config import (
     BACKEND_HOST,
     BACKEND_PORT,
+    BMS_IDS,
     DDSU_IDS,
     POLL_INTERVAL,
     PZEM_IDS,
@@ -93,6 +95,18 @@ latest_data = {}
 #               "humidity": 60.0
 #           },
 #       },
+#       {
+#           "id": 9,
+#           "type": "BMS",
+#           "data": {
+#               "voltage": 2766,
+#               "current": 62.4,
+#               "capacity": 500.0,
+#               "state_of_charge": 85,
+#               "state_of_health": 95,
+#               "cycle_count": 1200,
+#           },
+#       },
 #   ]
 # }
 # =========================
@@ -147,6 +161,18 @@ hour_bucket = {}
 #               "humidity": 600
 #           },
 #       },
+#       {
+#           "id": 9,
+#           "type": "BMS",
+#           "data": {
+#               "voltage": 2766,
+#               "current": 62.4,
+#               "capacity": 500.0,
+#               "state_of_charge": 85,
+#               "state_of_health": 95,
+#               "cycle_count": 1200,
+#           },
+#       },
 #   ]
 # }
 # =========================
@@ -186,7 +212,7 @@ async def update_bucket(payload):
     global hour_bucket
 
     timestamp = int(time.time())
-    hour_start = timestamp - (timestamp % 3600)
+    hour_start = timestamp - (timestamp % 60)
 
     if hour_start != hour_bucket.get("ts"):
         # Flush previous hour bucket
@@ -246,6 +272,11 @@ async def modbus_reader():
             for sid in SHT_IDS:
                 sht_data = await read_sht(sid)
                 data.append({"id": sid, "type": "SHT", "data": sht_data})
+
+            # Read BMS sensor
+            for sid in BMS_IDS:
+                bms_data = await read_bms(sid)
+                data.append({"id": sid, "type": "BMS", "data": bms_data})
 
             global latest_data
             latest_data = {"ts": timestamp, "data": data}
