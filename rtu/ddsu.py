@@ -10,7 +10,7 @@ async def read_ddsu(device_id):
     sim = get_simulated_scenario()
 
     # Map logic
-    power = sim["p1"] if device_id == 1 else sim["servers"].get(device_id, 0)
+    power = sim["p2"] if device_id == 2 else sim["servers"].get(device_id, 0)
 
     return {
         "voltage": round(random.uniform(228.0, 232.0), 2),
