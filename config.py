@@ -1,6 +1,6 @@
 # ================= CONFIG =================
 
-POLL_INTERVAL = 10  # seconds
+POLL_INTERVAL = 60  # seconds
 
 RTU_PORT = "/dev/ttyUSB0"
 RTU_BAUD = 9600

@@ -212,7 +212,7 @@ async def update_bucket(payload):
     global hour_bucket
 
     timestamp = int(time.time())
-    hour_start = timestamp - (timestamp % 60)
+    hour_start = timestamp - (timestamp % 3600)
 
     if hour_start != hour_bucket.get("ts"):
         # Flush previous hour bucket
