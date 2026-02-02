@@ -261,21 +261,29 @@ async def modbus_reader():
             # Read DDSU meters
             for sid in DDSU_IDS:
                 ddsu_data = await read_ddsu(sid)
+                if ddsu_data == {}:
+                    continue
                 data.append({"id": sid, "type": "DDSU", "data": ddsu_data})
 
             # Read PZEM meter
             for sid in PZEM_IDS:
                 pzem_data = await read_pzem(sid)
+                if pzem_data == {}:
+                    continue
                 data.append({"id": sid, "type": "PZEM", "data": pzem_data})
 
             # Read SHT sensor
             for sid in SHT_IDS:
                 sht_data = await read_sht(sid)
+                if sht_data == {}:
+                    continue
                 data.append({"id": sid, "type": "SHT", "data": sht_data})
 
             # Read BMS sensor
             for sid in BMS_IDS:
                 bms_data = await read_bms(sid)
+                if bms_data == {}:
+                    continue
                 data.append({"id": sid, "type": "BMS", "data": bms_data})
 
             global latest_data
