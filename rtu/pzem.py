@@ -1,19 +1,51 @@
-import asyncio
-import random
-import time
+from pymodbus.client import AsyncModbusSerialClient
 
-from helper.simulation import get_simulated_scenario
+from config import RTU_BAUD, RTU_PARITY, RTU_PORT, RTU_PZEM_STOPBITS
 
 
 async def read_pzem(device_id):
-    await asyncio.sleep(0.05)
-    sim = get_simulated_scenario()
+    client = AsyncModbusSerialClient(
+        port=RTU_PORT,
+        baudrate=RTU_BAUD,
+        parity=RTU_PARITY,
+        stopbits=RTU_PZEM_STOPBITS,
+        bytesize=8,
+        timeout=1,
+    )
 
-    p3 = sim["p3"] if device_id == 3 else 0
+    data = {}
 
-    return {
-        "voltage": round(random.uniform(228.0, 232.0), 2),
-        "current": round(p3 / 230, 2),
-        "power": round(p3, 2),
-        "energy": 5000 + (int(time.time()) % 1000),  # Accumulating
-    }
+    await client.connect()
+
+    if not client.connected:
+        print(f"Error reading PZEM {device_id}: {e}")
+        return data
+
+    try:
+        result = await client.read_holding_registers(
+            0x0000, count=8, device_id=device_id
+        )
+
+        if result.isError():
+            print(f"Error reading PZEM {device_id}: {result}")
+
+        else:
+            v = result.registers[0]
+            a = result.registers[1]
+            p = result.registers[2]
+            e = result.registers[4]
+
+            data = {
+                "voltage": v / 100.0,
+                "current": a / 100.0,
+                "power": p / 10.0,
+                "energy": e,
+            }
+
+    except Exception as e:
+        print(f"Error reading PZEM {device_id}: {e}")
+
+    finally:
+        client.close()
+
+    return data
