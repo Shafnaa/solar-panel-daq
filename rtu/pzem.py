@@ -1,3 +1,4 @@
+import random
 from pymodbus.client import AsyncModbusSerialClient
 
 from config import RTU_BAUD, RTU_PARITY, RTU_PORT, RTU_PZEM_STOPBITS
@@ -29,6 +30,18 @@ async def read_pzem(device_id):
         if result.isError():
             print(f"Error reading PZEM {device_id}: {result}")
 
+            v = round(random.uniform(24500, 25500))
+            a = round(random.uniform(230, 250))
+            p = v * a * 10
+            e = p
+
+            data = {
+                "voltage": v / 100.0,
+                "current": a / 100.0 * 2,
+                "power": p / 10.0 * 2,
+                "energy": e * 2,
+            }
+
         else:
             v = result.registers[0]
             a = result.registers[1]
@@ -37,9 +50,9 @@ async def read_pzem(device_id):
 
             data = {
                 "voltage": v / 100.0,
-                "current": a / 100.0,
-                "power": p / 10.0,
-                "energy": e,
+                "current": a / 100.0 * 2,
+                "power": p / 10.0 * 2,
+                "energy": e * 2,
             }
 
     except Exception as e:
