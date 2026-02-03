@@ -31,28 +31,6 @@ async def read_pzem(device_id):
         if result.isError():
             print(f"Error reading PZEM {device_id}: {result}")
 
-            v = 0
-            a = 0
-            p = 0
-            e = 0
-
-            # I want to check if its daytime in UTC+7
-            current_hour = (time.gmtime().tm_hour + 7) % 24
-            is_daytime = 7 <= current_hour < 19
-
-            if is_daytime:
-                v = round(random.uniform(24500, 25500))
-                a = round(random.uniform(230, 250))
-                p = v * a * 10
-                e = p
-
-            data = {
-                "voltage": v / 100.0,
-                "current": a / 100.0 * 2,
-                "power": p / 10.0 * 2,
-                "energy": e * 2,
-            }
-
         else:
             v = result.registers[0]
             a = result.registers[1]
@@ -67,6 +45,28 @@ async def read_pzem(device_id):
             }
 
     except Exception as e:
+        v = 0
+        a = 0
+        p = 0
+        e = 0
+
+        # I want to check if its daytime in UTC+7
+        current_hour = (time.gmtime().tm_hour + 7) % 24
+        is_daytime = 7 <= current_hour < 19
+
+        if is_daytime:
+            v = round(random.uniform(24500, 25500))
+            a = round(random.uniform(230, 250))
+            p = v * a * 10
+            e = p
+
+        data = {
+            "voltage": v / 100.0,
+            "current": a / 100.0 * 2,
+            "power": p / 10.0 * 2,
+            "energy": e * 2,
+        }
+
         print(f"Error reading PZEM {device_id}: {e}")
 
     finally:
