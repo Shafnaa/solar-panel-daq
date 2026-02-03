@@ -1,4 +1,5 @@
 import random
+import time
 from pymodbus.client import AsyncModbusSerialClient
 
 from config import RTU_BAUD, RTU_PARITY, RTU_PORT, RTU_PZEM_STOPBITS
@@ -30,10 +31,20 @@ async def read_pzem(device_id):
         if result.isError():
             print(f"Error reading PZEM {device_id}: {result}")
 
-            v = round(random.uniform(24500, 25500))
-            a = round(random.uniform(230, 250))
-            p = v * a * 10
-            e = p
+            v = 0
+            a = 0
+            p = 0
+            e = 0
+
+            # I want to check if its daytime in UTC+7
+            current_hour = (time.gmtime().tm_hour + 7) % 24
+            is_daytime = 7 <= current_hour < 19
+
+            if is_daytime:
+                v = round(random.uniform(24500, 25500))
+                a = round(random.uniform(230, 250))
+                p = v * a * 10
+                e = p
 
             data = {
                 "voltage": v / 100.0,
