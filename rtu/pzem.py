@@ -57,8 +57,8 @@ async def read_pzem(device_id):
         if is_daytime:
             v = round(random.uniform(24500, 25500))
             a = round(random.uniform(230, 250))
-            p = v * a * 10 / 1000
-            e = p
+            p = v * a * 10 / 10000
+            e = p / 10
 
         data = {
             "voltage": v / 100.0,
